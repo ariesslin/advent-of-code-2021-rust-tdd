@@ -1,7 +1,7 @@
 mod day1;
 use std::{error::Error, path::Path};
 
-use day1::{lines_from_file};
+use day1::lines_from_file;
 
 #[derive(Clone)]
 struct DiveAction {
@@ -62,15 +62,39 @@ fn get_final_diving_position(
     (horizontal_pos, depth_pos)
 }
 
+fn get_final_diving_position_adjusted_by_aim(
+    mut aim: i64,
+    (mut horizontal_pos, mut depth_pos): (i64, i64),
+    actions: Vec<DiveAction>,
+) -> (i64, i64) {
+    for action in actions {
+        match action.get_action_direction() {
+            DiveDirection::Forward => {
+                horizontal_pos += action.get_action_length();
+                depth_pos += aim * action.get_action_length();
+            }
+            DiveDirection::Up => aim -= action.get_action_length(),
+            DiveDirection::Down => aim += action.get_action_length(),
+        }
+    }
+    (horizontal_pos, depth_pos)
+}
+
 fn main() {
     //day1_main();
 
     let actions = read_actions_from_file_by_line("day2_input.txt").expect("Could not load lines");
     println!("total {} lines", actions.len());
 
-    let (horizontal_pos, depth_pos) = get_final_diving_position((0, 0), actions);
+    let (horizontal_pos, depth_pos) = get_final_diving_position((0, 0), actions.clone());
     println!(
         "the multiply of final positions is {}",
+        horizontal_pos * depth_pos
+    );
+
+    let (horizontal_pos, depth_pos) = get_final_diving_position_adjusted_by_aim(0, (0, 0), actions);
+    println!(
+        "the multiply of final positions with aim is {}",
         horizontal_pos * depth_pos
     );
 }
@@ -121,5 +145,41 @@ mod tests {
         let (horizontal_pos, depth_pos) =
             get_final_diving_position((horizontal_pos, depth_pos), actions);
         assert_eq!(horizontal_pos * depth_pos, 150);
+    }
+
+    #[test]
+    fn should_get_right_final_position_given_the_diving_action_consequences_and_aim() {
+        let (horizontal_pos, depth_pos) = (0, 0);
+        let aim = 0;
+
+        let actions = vec![
+            DiveAction {
+                direction: DiveDirection::Forward,
+                length: 5,
+            },
+            DiveAction {
+                direction: DiveDirection::Down,
+                length: 5,
+            },
+            DiveAction {
+                direction: DiveDirection::Forward,
+                length: 8,
+            },
+            DiveAction {
+                direction: DiveDirection::Up,
+                length: 3,
+            },
+            DiveAction {
+                direction: DiveDirection::Down,
+                length: 8,
+            },
+            DiveAction {
+                direction: DiveDirection::Forward,
+                length: 2,
+            },
+        ];
+        let (horizontal_pos, depth_pos) =
+            get_final_diving_position_adjusted_by_aim(aim, (horizontal_pos, depth_pos), actions);
+        assert_eq!(horizontal_pos * depth_pos, 900);
     }
 }
