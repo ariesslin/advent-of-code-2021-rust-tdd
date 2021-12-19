@@ -7,7 +7,7 @@ use std::{
 
 const WINDOW_SIZE: usize = 3;
 
-fn lines_from_file(filename: impl AsRef<Path>) -> io::Result<Vec<String>> {
+pub fn lines_from_file(filename: impl AsRef<Path>) -> io::Result<Vec<String>> {
     BufReader::new(File::open(filename)?).lines().collect()
 }
 
