@@ -1,8 +1,5 @@
-use std::{
-    error::Error,
-    path::Path,
-};
 use common::lines_from_file;
+use std::{error::Error, path::Path};
 
 const WINDOW_SIZE: usize = 3;
 

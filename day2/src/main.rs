@@ -1,5 +1,5 @@
-use std::{error::Error, path::Path};
 use common::lines_from_file;
+use std::{error::Error, path::Path};
 
 #[derive(Clone)]
 struct DiveAction {
@@ -13,7 +13,7 @@ impl DiveAction {
     }
 
     pub fn get_action_length(&self) -> i64 {
-        self.length.clone()
+        self.length
     }
 }
 
@@ -103,9 +103,9 @@ mod tests {
     // TODO: is this an integration test?
     fn should_get_all_actions_from_file_by_line_given_the_filename() {
         let filename = "day2_test.txt";
-        let nums = read_actions_from_file_by_line(filename).unwrap();
+        let actions = read_actions_from_file_by_line(filename).unwrap();
 
-        assert_eq!(nums.len(), 6);
+        assert_eq!(actions.len(), 6);
     }
 
     #[test]
