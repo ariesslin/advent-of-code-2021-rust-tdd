@@ -3,5 +3,23 @@
 version = 3
 
 [[package]]
+name = "common"
+version = "0.1.0"
+
+[[package]]
 name = "day1"
+version = "0.1.0"
+dependencies = [
+ "common",
+]
+
+[[package]]
+name = "day2"
+version = "0.1.0"
+dependencies = [
+ "common",
+]
+
+[[package]]
+name = "day3"
 version = "0.1.0"

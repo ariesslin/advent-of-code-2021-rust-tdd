@@ -1,15 +1,10 @@
 use std::{
     error::Error,
-    fs::File,
-    io::{self, BufRead, BufReader},
     path::Path,
 };
+use common::lines_from_file;
 
 const WINDOW_SIZE: usize = 3;
-
-pub fn lines_from_file(filename: impl AsRef<Path>) -> io::Result<Vec<String>> {
-    BufReader::new(File::open(filename)?).lines().collect()
-}
 
 fn read_nums_from_file_by_line(filename: impl AsRef<Path>) -> Result<Vec<i64>, Box<dyn Error>> {
     let lines_from_file = lines_from_file(filename)?;
@@ -53,7 +48,7 @@ fn get_sonar_measurement_increase_count_by_sliding_window(nums: Vec<i64>) -> usi
     count
 }
 
-pub fn day1_main() {
+pub fn main() {
     let nums = read_nums_from_file_by_line("day1_input.txt").expect("Could not load lines");
     println!("total {} lines", nums.len());
 

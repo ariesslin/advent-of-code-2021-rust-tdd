@@ -1,7 +1,5 @@
-mod day1;
 use std::{error::Error, path::Path};
-
-use day1::lines_from_file;
+use common::lines_from_file;
 
 #[derive(Clone)]
 struct DiveAction {
@@ -81,8 +79,6 @@ fn get_final_diving_position_adjusted_by_aim(
 }
 
 fn main() {
-    //day1_main();
-
     let actions = read_actions_from_file_by_line("day2_input.txt").expect("Could not load lines");
     println!("total {} lines", actions.len());
 

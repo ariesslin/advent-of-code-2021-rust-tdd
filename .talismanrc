@@ -1,4 +1,10 @@
 fileignoreconfig:
-- filename: Cargo.toml
-  checksum: ff4735ef5d18f35aeeaed5a200b4735b866d781c29b4b067d3d32523c6293336
+- filename: day1/Cargo.toml
+  checksum: a49087b8ced5a98747504c9051aa9bf9e172bb26ffe2b6588d1d2f03cd28f510
+- filename: day2/Cargo.toml
+  checksum: ad07cee23cc4e1bcd2aa17049d8e833efafe87229f43839879591bdeddd405e7
+- filename: day3/Cargo.toml
+  checksum: fc0b010ab27e8fbed4f03bc30412626db4096fa828f17783d0d299a14d931c79
+- filename: common/Cargo.toml
+  checksum: 8f4e8c7d01bc0cac34f61c595cb799da219ecae522cf9d7cc06b016c5a301fdd
 version: ""
