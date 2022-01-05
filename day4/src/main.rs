@@ -59,9 +59,17 @@ fn get_bingo_boards_from_file(
 fn get_winner_bingo_board(
     bingo_inputs: Vec<i64>,
     mut bingo_boards: Vec<BingoBoard>,
+    get_last: bool,
 ) -> (Option<usize>, i64, Option<BingoBoard>) {
+    let mut count = 0;
+    let bingo_boards_num = bingo_boards.len();
+    let mut board_win_record = vec![0; bingo_boards_num];
+
     for bingo_input in bingo_inputs {
         for (board_number, bingo_board) in bingo_boards.iter_mut().enumerate() {
+            if board_win_record[board_number] == 1 {
+                continue;
+            }
             //println!("bingo board is {:?}", bingo_board);
             let (x, y) = match bingo_board.pos_mapping.get(&bingo_input) {
                 Some((x, y)) => (x, y),
@@ -72,11 +80,21 @@ fn get_winner_bingo_board(
             bingo_board.column_sum[*y] += 1;
             for i in bingo_board.row_sum.clone() {
                 if i == 5 {
-                    return (Some(board_number), bingo_input, Some(bingo_board.clone()));
+                    board_win_record[board_number] = 1;
                 }
             }
             for j in bingo_board.column_sum.clone() {
                 if j == 5 {
+                    board_win_record[board_number] = 1;
+                }
+            }
+            if board_win_record[board_number] == 1 {
+                count += 1;
+                if get_last {
+                    if count == bingo_boards_num {
+                        return (Some(board_number), bingo_input, Some(bingo_board.clone()));
+                    }
+                } else {
                     return (Some(board_number), bingo_input, Some(bingo_board.clone()));
                 }
             }
@@ -100,11 +118,19 @@ fn main() {
     let filename = "day4_input.txt";
     let bingo_inputs = read_bingo_input_from_file(filename).unwrap();
     let bingo_boards = get_bingo_boards_from_file(filename).unwrap();
-    let (_winner, bingo_input, bingo_board) = get_winner_bingo_board(bingo_inputs, bingo_boards);
+    let (_winner, bingo_input, bingo_board) =
+        get_winner_bingo_board(bingo_inputs.clone(), bingo_boards.clone(), false);
 
     let sum = get_sum_of_unmarked_number_in_board(bingo_board.unwrap());
 
-    println!("The final result is {}", bingo_input * sum);
+    println!("The first round final result is {}", bingo_input * sum);
+
+    let (_winner, bingo_input, bingo_board) =
+        get_winner_bingo_board(bingo_inputs, bingo_boards, true);
+
+    let sum = get_sum_of_unmarked_number_in_board(bingo_board.unwrap());
+
+    println!("The second round final result is {}", bingo_input * sum);
 }
 
 #[cfg(test)]
@@ -133,12 +159,28 @@ mod tests {
         let filename = "day4_test.txt";
         let bingo_inputs = read_bingo_input_from_file(filename).unwrap();
         let bingo_boards = get_bingo_boards_from_file(filename).unwrap();
-        let (winner, bingo_input, bingo_board) = get_winner_bingo_board(bingo_inputs, bingo_boards);
+        let (winner, bingo_input, bingo_board) =
+            get_winner_bingo_board(bingo_inputs, bingo_boards, false);
 
         let sum = get_sum_of_unmarked_number_in_board(bingo_board.unwrap());
 
         assert_eq!(winner, Some(2));
         assert_eq!(bingo_input, 24);
         assert_eq!(sum, 188);
+    }
+
+    #[test]
+    fn should_get_last_winner_given_the_bingo_inputs_and_bingo_boards() {
+        let filename = "day4_test.txt";
+        let bingo_inputs = read_bingo_input_from_file(filename).unwrap();
+        let bingo_boards = get_bingo_boards_from_file(filename).unwrap();
+        let (winner, bingo_input, bingo_board) =
+            get_winner_bingo_board(bingo_inputs, bingo_boards, true);
+
+        let sum = get_sum_of_unmarked_number_in_board(bingo_board.unwrap());
+
+        assert_eq!(winner, Some(1));
+        assert_eq!(bingo_input, 13);
+        assert_eq!(sum, 148);
     }
 }
