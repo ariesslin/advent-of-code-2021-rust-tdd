@@ -25,23 +25,27 @@ fn read_fishes_from_file_by_line(filename: impl AsRef<Path>) -> Result<Vec<i64>,
     Ok(fishes)
 }
 
-fn get_fish_count_after_spawning(init_fishes: Vec<i64>, spawn_days: i64) -> i64 {
-    let mut fishes = init_fishes;
-    for _ in 0..spawn_days {
-        let mut new_producing_count = 0;
-        for fish in fishes.iter_mut() {
-            if *fish == 0 {
-                *fish = 6;
-                new_producing_count += 1;
-            } else {
-                *fish -= 1;
-            }
-        }
-        let mut new_fishes = vec![8; new_producing_count];
-        fishes.append(&mut new_fishes);
-        //println!("the fishes are {:?}", fishes);
+fn get_fish_count_after_spawning(fishes: Vec<i64>, spawn_days: i64) -> i64 {
+    let mut fish_day_count = vec![0; 9];
+    for fish in fishes.iter() {
+        fish_day_count[*fish as usize] += 1;
     }
-    fishes.len() as i64
+
+    for _ in 0..spawn_days {
+        let mut tmp_pre = fish_day_count[8];
+        let mut tmp_now = 0;
+        for c in (0..8).rev() {
+            tmp_now = fish_day_count[c];
+            fish_day_count[c] = tmp_pre;
+            tmp_pre = tmp_now;
+        }
+        fish_day_count[8] = tmp_now;
+        fish_day_count[6] += tmp_now;
+
+        //println!("fish day count vector is {:?}", fish_day_count);
+    }
+
+    fish_day_count.iter().sum()
 }
 
 #[cfg(test)]
