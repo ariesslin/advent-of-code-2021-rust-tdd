@@ -1,4 +1,4 @@
-use common::lines_from_file;
+use common::numbers_from_first_line_in_file;
 use std::{error::Error, path::Path};
 
 fn main() {
@@ -6,23 +6,14 @@ fn main() {
     let fishes = read_fishes_from_file_by_line(filename).unwrap();
 
     let fish_count = get_fish_count_after_spawning(fishes.clone(), 80);
-
     println!("the fishes number is {:?}", fish_count);
 
     let fish_count = get_fish_count_after_spawning(fishes, 256);
-
     println!("the fishes number is {:?}", fish_count);
 }
 
 fn read_fishes_from_file_by_line(filename: impl AsRef<Path>) -> Result<Vec<i64>, Box<dyn Error>> {
-    let lines_from_file = lines_from_file(filename)?;
-    let mut fishes = vec![];
-    for fish in lines_from_file[0].trim().split(',').collect::<Vec<&str>>() {
-        //println!("{:?}", line);
-        let fish = fish.trim().parse::<i64>()?;
-        fishes.push(fish);
-    }
-    Ok(fishes)
+    numbers_from_first_line_in_file(filename)
 }
 
 fn get_fish_count_after_spawning(fishes: Vec<i64>, spawn_days: i64) -> i64 {
