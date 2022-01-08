@@ -22,6 +22,24 @@ pub fn numbers_from_first_line_in_file(
     Ok(numbers)
 }
 
+pub fn parse_numbers_without_split_sign_from_lines_in_file(
+    filename: impl AsRef<Path>,
+) -> Result<Vec<Vec<i64>>, Box<dyn Error>> {
+    let lines_from_file = lines_from_file(filename)?;
+    let mut numbers = vec![];
+    for line in lines_from_file {
+        //println!("{:?}", line);
+        let chars = line.trim().chars();
+        let mut number = vec![];
+        for c in chars {
+            let bit: i64 = c.to_digit(10).unwrap() as i64;
+            number.push(bit);
+        }
+        numbers.push(number);
+    }
+    Ok(numbers)
+}
+
 #[cfg(test)]
 mod tests {
     #[test]

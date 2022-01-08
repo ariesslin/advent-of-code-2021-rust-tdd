@@ -1,25 +1,18 @@
-use common::lines_from_file;
+use common::parse_numbers_without_split_sign_from_lines_in_file;
 use std::{error::Error, path::Path};
 
 #[derive(Default, Clone, Debug)]
 struct DiagnosticReportBinary {
-    bits: Vec<u32>,
+    bits: Vec<i64>,
 }
 
 fn read_power_consumption_binary_from_file_by_line(
     filename: impl AsRef<Path>,
 ) -> Result<Vec<DiagnosticReportBinary>, Box<dyn Error>> {
-    let lines_from_file = lines_from_file(filename)?;
+    let numbers = parse_numbers_without_split_sign_from_lines_in_file(filename)?;
     let mut readings = vec![];
-    for line in lines_from_file {
-        //println!("{:?}", line);
-        let chars = line.trim().chars();
-        let mut bits = vec![];
-        for c in chars {
-            let bit = c.to_digit(10).unwrap();
-            bits.push(bit);
-        }
-        let reading = DiagnosticReportBinary { bits };
+    for number in numbers {
+        let reading = DiagnosticReportBinary { bits: number };
         readings.push(reading);
     }
     Ok(readings)
@@ -28,7 +21,7 @@ fn read_power_consumption_binary_from_file_by_line(
 fn get_power_consumption(readings: Vec<DiagnosticReportBinary>) -> (u32, u32) {
     let bit_length = readings[0].bits.len();
     let mut bit_sums = vec![0; bit_length];
-    let major_threshold = readings.len() as u32;
+    let major_threshold = readings.len() as i64;
 
     for reading in readings {
         for (index, bit) in reading.bits.iter().enumerate() {
@@ -54,7 +47,7 @@ fn get_power_consumption(readings: Vec<DiagnosticReportBinary>) -> (u32, u32) {
     (gamma_rate, epsilon_rate)
 }
 
-fn get_life_support_rating(readings: Vec<DiagnosticReportBinary>) -> (u32, u32) {
+fn get_life_support_rating(readings: Vec<DiagnosticReportBinary>) -> (i64, i64) {
     let oxygen_generator_rating = get_final_reading(readings.clone(), true);
     let co2_scrubber_rating = get_final_reading(readings, false);
 
@@ -64,7 +57,7 @@ fn get_life_support_rating(readings: Vec<DiagnosticReportBinary>) -> (u32, u32) 
     (oxygen_generator_rating, co2_scrubber_rating)
 }
 
-fn calculate_decimal(binary: DiagnosticReportBinary) -> u32 {
+fn calculate_decimal(binary: DiagnosticReportBinary) -> i64 {
     let mut i = 1;
     let mut decimal = 0;
     for bit_sum in binary.bits.iter().rev() {
@@ -86,7 +79,7 @@ fn get_final_reading(
         }
 
         let mut bit_sum = 0;
-        let major_threshold = readings.len() as u32;
+        let major_threshold = readings.len() as i64;
 
         for reading in &readings {
             bit_sum += reading.bits[index];
