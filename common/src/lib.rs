@@ -40,6 +40,24 @@ pub fn parse_numbers_without_split_sign_from_lines_in_file(
     Ok(numbers)
 }
 
+pub fn parse_strings_without_split_sign_from_lines_in_file(
+    filename: impl AsRef<Path>,
+) -> Result<Vec<Vec<String>>, Box<dyn Error>> {
+    let lines_from_file = lines_from_file(filename)?;
+    let mut strs = vec![];
+    for line in lines_from_file {
+        //println!("{:?}", line);
+        let chars = line.trim().chars();
+        let mut str = vec![];
+        for c in chars {
+            let bit: String = c.to_string();
+            str.push(bit);
+        }
+        strs.push(str);
+    }
+    Ok(strs)
+}
+
 #[cfg(test)]
 mod tests {
     #[test]
