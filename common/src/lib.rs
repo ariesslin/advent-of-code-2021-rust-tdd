@@ -58,6 +58,16 @@ pub fn parse_strings_without_split_sign_from_lines_in_file(
     Ok(strs)
 }
 
+pub fn get_extended_metrix(metrix: &[Vec<i64>]) -> Vec<Vec<i64>> {
+    let height = metrix.len() + 2;
+    let width = metrix[0].len() + 2;
+    let mut extended_metrix = vec![vec![10; width]; height];
+    for (index, extended_row) in extended_metrix[1..height - 1].iter_mut().enumerate() {
+        extended_row.splice(1..width - 1, metrix[index].iter().cloned());
+    }
+    extended_metrix
+}
+
 #[cfg(test)]
 mod tests {
     #[test]

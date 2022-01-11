@@ -1,4 +1,4 @@
-use common::parse_numbers_without_split_sign_from_lines_in_file;
+use common::{get_extended_metrix, parse_numbers_without_split_sign_from_lines_in_file};
 use std::{collections::HashSet, error::Error, path::Path};
 
 struct LowPoint {
@@ -7,41 +7,20 @@ struct LowPoint {
     value: i64,
 }
 
-struct ExtendedHeightMap {
-    height: i64,
-    width: i64,
-    heightmap: Vec<Vec<i64>>,
-}
-
 fn read_heightmap_from_file(filename: impl AsRef<Path>) -> Result<Vec<Vec<i64>>, Box<dyn Error>> {
     parse_numbers_without_split_sign_from_lines_in_file(filename)
 }
 
-fn get_extended_heightmap(heightmap: &[Vec<i64>]) -> ExtendedHeightMap {
+fn get_low_points_from_heightmap(heightmap: Vec<Vec<i64>>) -> Vec<LowPoint> {
     let height = heightmap.len() + 2;
     let width = heightmap[0].len() + 2;
-
-    let mut extended_heightmaps = vec![vec![10; width]; height];
-    for (index, extended_row) in extended_heightmaps[1..height - 1].iter_mut().enumerate() {
-        extended_row.splice(1..width - 1, heightmap[index].iter().cloned());
-    }
-
-    ExtendedHeightMap {
-        height: height as i64,
-        width: width as i64,
-        heightmap: extended_heightmaps,
-    }
-}
-
-fn get_low_points_from_heightmap(heightmap: Vec<Vec<i64>>) -> Vec<LowPoint> {
-    let eh = get_extended_heightmap(&heightmap);
-    let extended_heightmap = eh.heightmap;
+    let extended_heightmap = get_extended_metrix(&heightmap);
 
     //println!("the extended heightmaps is {:#?}", extended_heightmap);
 
     let mut low_points = vec![];
-    for x in 1..(eh.height as usize - 1) {
-        for y in 1..(eh.width as usize - 1) {
+    for x in 1..(height as usize - 1) {
+        for y in 1..(width as usize - 1) {
             if extended_heightmap[x][y] < extended_heightmap[x][y - 1]
                 && extended_heightmap[x][y] < extended_heightmap[x][y + 1]
                 && extended_heightmap[x][y] < extended_heightmap[x - 1][y]
@@ -65,8 +44,7 @@ fn is_valid(extended_heightmap: &[Vec<i64>], x: i64, y: i64, basin: &HashSet<(i6
 }
 
 fn get_basin_sizes_from_heightmap(heightmap: Vec<Vec<i64>>) -> Vec<i64> {
-    let eh = get_extended_heightmap(&heightmap);
-    let extended_heightmap = eh.heightmap;
+    let extended_heightmap = get_extended_metrix(&heightmap);
 
     let low_points = get_low_points_from_heightmap(heightmap);
     let mut basin_sizes = vec![];

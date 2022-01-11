@@ -1,4 +1,6 @@
 fileignoreconfig:
+- filename: day11/Cargo.toml
+  checksum: ddb551fb27afd85c33667897c1cb955735802d204fef5c3aec537344a77a68b5
 - filename: day10/Cargo.toml
   checksum: b20e35361cb6dbc678850c283e3f6a021432ef93319b0c71cb0b46cdc76d455e
 - filename: day9/day9_input.txt
