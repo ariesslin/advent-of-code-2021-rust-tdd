@@ -94,14 +94,35 @@ fn get_octopuses_snapshot(
     (octopuses, flashed_list)
 }
 
+fn get_first_full_octopus_flash_step(initial_octopuses: Vec<Vec<i64>>) -> i64 {
+    let rows = initial_octopuses.len();
+    let columns = initial_octopuses[0].len();
+    let mut step = 0;
+    let mut flashed = 0;
+    let mut octopuses = initial_octopuses;
+    while flashed != rows * columns {
+        let result = added_one_to_metrix(octopuses);
+        step += 1;
+        octopuses = result.0;
+        flashed = result.1 as usize;
+    }
+    step
+}
+
 fn main() {
     let filename = "day11_input.txt";
     let octopuses = read_octopuses_metrix_from_file(filename).unwrap();
 
     println!(
         "total flashes after 100 steps are {}",
-        get_octopuses_snapshot(octopuses, 100).1.iter().sum::<i64>()
+        get_octopuses_snapshot(octopuses.clone(), 100)
+            .1
+            .iter()
+            .sum::<i64>()
     );
+
+    let step = get_first_full_octopus_flash_step(octopuses);
+    println!("first full octopuses flash step is {}", step);
 }
 
 #[cfg(test)]
@@ -148,5 +169,14 @@ mod tests {
             get_octopuses_snapshot(octopuses, 100).1.iter().sum::<i64>(),
             1656
         );
+    }
+
+    #[test]
+    fn should_get_right_first_full_octopuses_flash_step_given_octopuses_metrix() {
+        let filename = "day11_test.txt";
+        let octopuses = read_octopuses_metrix_from_file(filename).unwrap();
+
+        let step = get_first_full_octopus_flash_step(octopuses);
+        assert_eq!(step, 195);
     }
 }
