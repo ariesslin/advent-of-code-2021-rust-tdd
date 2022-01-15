@@ -5,6 +5,43 @@ use std::{
     path::Path,
 };
 
+#[derive(Debug, Clone)]
+pub struct Stack<T> {
+    pub stack: Vec<T>,
+}
+
+impl<T> Stack<T> {
+    pub fn new() -> Self {
+        Stack { stack: Vec::new() }
+    }
+
+    // fn length(&self) -> usize {
+    //     self.stack.len()
+    // }
+
+    pub fn pop(&mut self) -> Option<T> {
+        self.stack.pop()
+    }
+
+    pub fn push(&mut self, item: T) {
+        self.stack.push(item)
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.stack.is_empty()
+    }
+
+    pub fn peek(&self) -> Option<&T> {
+        self.stack.last()
+    }
+}
+
+impl<T> Default for Stack<T> {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 pub fn lines_from_file(filename: impl AsRef<Path>) -> io::Result<Vec<String>> {
     BufReader::new(File::open(filename)?).lines().collect()
 }
