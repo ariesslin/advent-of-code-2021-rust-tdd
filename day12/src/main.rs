@@ -1,6 +1,7 @@
 use common::{lines_from_file, Stack};
 use std::{collections::HashMap, error::Error, path::Path};
 
+#[derive(Debug, Clone)]
 struct AadjacencyMatrix {
     nodes: Vec<String>,
     edges: HashMap<String, Vec<usize>>,
@@ -43,11 +44,15 @@ fn read_adjacency_matrix_from_file(
     Ok(AadjacencyMatrix { nodes, edges })
 }
 
-fn get_all_paths_from_start_to_end(cave_graph: AadjacencyMatrix) -> Vec<Vec<String>> {
+fn get_all_paths_from_start_to_end(
+    cave_graph: AadjacencyMatrix,
+    has_longer_time: bool,
+) -> Vec<Vec<String>> {
     let mut main_stack: Stack<String> = Stack::new();
     let mut side_stack: Stack<Vec<usize>> = Stack::new();
 
     let mut paths = vec![];
+    let mut twice_little_cave = String::new();
 
     let node = "start".to_string();
     let connected_nodes = cave_graph.edges.get(&node).unwrap().to_vec();
@@ -59,7 +64,9 @@ fn get_all_paths_from_start_to_end(cave_graph: AadjacencyMatrix) -> Vec<Vec<Stri
 
         let mut connected_nodes = side_stack.pop().unwrap();
         if connected_nodes.is_empty() {
-            main_stack.pop();
+            if main_stack.pop().unwrap() == twice_little_cave {
+                twice_little_cave = String::new();
+            };
             continue;
         } else {
             let next_pos = connected_nodes.pop().unwrap();
@@ -73,6 +80,16 @@ fn get_all_paths_from_start_to_end(cave_graph: AadjacencyMatrix) -> Vec<Vec<Stri
                 let connected_nodes = cave_graph.edges.get(&node).unwrap().to_vec();
                 main_stack.push(node);
                 side_stack.push(connected_nodes);
+            } else if has_longer_time
+                && twice_little_cave.is_empty()
+                && main_stack.stack.contains(&node)
+                && node.chars().all(char::is_lowercase)
+                && node != *"start"
+            {
+                twice_little_cave = node.clone();
+                let connected_nodes = cave_graph.edges.get(&node).unwrap().to_vec();
+                main_stack.push(node);
+                side_stack.push(connected_nodes);
             } else {
                 continue;
             }
@@ -81,7 +98,9 @@ fn get_all_paths_from_start_to_end(cave_graph: AadjacencyMatrix) -> Vec<Vec<Stri
         if main_stack.peek().unwrap() == "end" {
             paths.push(main_stack.stack.clone());
 
-            main_stack.pop();
+            if main_stack.pop().unwrap() == twice_little_cave {
+                twice_little_cave = String::new();
+            };
             side_stack.pop();
         }
     }
@@ -93,9 +112,13 @@ fn main() {
     let filename = "day12_input.txt";
     let cave_graph = read_adjacency_matrix_from_file(filename).unwrap();
 
-    let paths = get_all_paths_from_start_to_end(cave_graph);
+    let paths = get_all_paths_from_start_to_end(cave_graph.clone(), false);
 
     println!("paths number is {:?}", paths.len());
+
+    let paths = get_all_paths_from_start_to_end(cave_graph, true);
+
+    println!("paths number(long time mode) is {:?}", paths.len());
 }
 
 #[cfg(test)]
@@ -120,7 +143,7 @@ mod tests {
         let filename = "day12_test.txt";
         let cave_graph = read_adjacency_matrix_from_file(filename).unwrap();
 
-        let paths = get_all_paths_from_start_to_end(cave_graph);
+        let paths = get_all_paths_from_start_to_end(cave_graph, false);
 
         //println!("paths are {:?}", paths);
         assert_eq!(paths.len(), 10);
@@ -128,7 +151,7 @@ mod tests {
         let filename = "day12_test_2.txt";
         let cave_graph = read_adjacency_matrix_from_file(filename).unwrap();
 
-        let paths = get_all_paths_from_start_to_end(cave_graph);
+        let paths = get_all_paths_from_start_to_end(cave_graph, false);
 
         //println!("paths are {:?}", paths);
         assert_eq!(paths.len(), 19);
@@ -136,9 +159,37 @@ mod tests {
         let filename = "day12_test_3.txt";
         let cave_graph = read_adjacency_matrix_from_file(filename).unwrap();
 
-        let paths = get_all_paths_from_start_to_end(cave_graph);
+        let paths = get_all_paths_from_start_to_end(cave_graph, false);
 
         //println!("paths are {:?}", paths);
         assert_eq!(paths.len(), 226);
+    }
+
+    #[test]
+    fn should_get_all_paths_with_longer_time_to_visit_a_small_cave_twice_from_start_to_end_given_adjacency_matrix(
+    ) {
+        let filename = "day12_test.txt";
+        let cave_graph = read_adjacency_matrix_from_file(filename).unwrap();
+
+        let paths = get_all_paths_from_start_to_end(cave_graph, true);
+
+        //println!("paths are {:?}", paths);
+        assert_eq!(paths.len(), 36);
+
+        let filename = "day12_test_2.txt";
+        let cave_graph = read_adjacency_matrix_from_file(filename).unwrap();
+
+        let paths = get_all_paths_from_start_to_end(cave_graph, true);
+
+        //println!("paths are {:?}", paths);
+        assert_eq!(paths.len(), 103);
+
+        let filename = "day12_test_3.txt";
+        let cave_graph = read_adjacency_matrix_from_file(filename).unwrap();
+
+        let paths = get_all_paths_from_start_to_end(cave_graph, true);
+
+        //println!("paths are {:?}", paths);
+        assert_eq!(paths.len(), 3509);
     }
 }
