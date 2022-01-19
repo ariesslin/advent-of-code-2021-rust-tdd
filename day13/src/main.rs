@@ -128,16 +128,35 @@ fn get_visible_dots_from_paper(paper: Vec<Vec<i64>>) -> i64 {
     dots
 }
 
+fn print_paper(paper: Vec<Vec<i64>>) {
+    for row in paper {
+        for item in row {
+            if item > 0 {
+                print!("#");
+            } else {
+                print!(".");
+            }
+        }
+        println!();
+    }
+}
+
 fn main() {
     let filename = "day13_input.txt";
     let manual = get_transparent_paper_from_file(filename).unwrap();
 
-    let new_manual = get_folded_paper_and_remaining_instructions(manual);
+    let mut new_manual = get_folded_paper_and_remaining_instructions(manual);
 
     println!(
         "the dots in new transparent paper are {:?}",
-        get_visible_dots_from_paper(new_manual.transparent_paper)
+        get_visible_dots_from_paper(new_manual.transparent_paper.clone())
     );
+
+    while !new_manual.fold_instructions.is_empty() {
+        new_manual = get_folded_paper_and_remaining_instructions(new_manual);
+    }
+
+    print_paper(new_manual.transparent_paper);
 }
 
 #[cfg(test)]
